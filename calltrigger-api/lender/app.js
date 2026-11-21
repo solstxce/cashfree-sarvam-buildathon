@@ -3,6 +3,7 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const key = $('#api-key'), file = $('#notebook'), load = $('#load'), preview = $('#preview-button');
   const queueNote = $('#queue-note'), previewNote = $('#preview-note'), results = $('#preview-results');
+  const addForm = $('#add'), add = $('#add-button'), addNote = $('#add-note');
   const money = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 2 });
   const dateStyle = { day: 'numeric', month: 'short', year: 'numeric' };
   const calendar = new Intl.DateTimeFormat('en-IN', { ...dateStyle, timeZone: 'UTC' });
@@ -69,7 +70,7 @@
 
   function controls() {
     key.readOnly = !!active;
-    load.disabled = file.disabled = !!active;
+    load.disabled = file.disabled = add.disabled = !!active;
     if (!active) load.textContent = loaded ? 'Reload queue' : 'Load queue';
     preview.disabled = !!active || !key.value.trim() || !file.files.length;
     $('#forget').hidden = !key.value;
@@ -81,6 +82,7 @@
     file.setCustomValidity('');
     clearQueue();
     clearPreview();
+    notice(addNote);
     controls();
   }
 
@@ -88,6 +90,7 @@
     active?.abort();
     key.value = '';
     key.setCustomValidity('');
+    addForm.reset();
     clearRecordView();
   }
 
@@ -294,6 +297,23 @@
         $('ul', results).append(li);
       }
       results.hidden = !rows?.length;
+      await loadQueue(signal);
+    });
+  });
+  addForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const body = Object.fromEntries([...new FormData(addForm)].map(([name, value]) => [name, value.trim()]));
+    body.outstanding_amount = Number(body.outstanding_amount);
+    run(add, 'Adding…', addNote, async signal => {
+      // dry_run registers the installment and never dispatches a call.
+      const response = await request('/trigger/call?dry_run=true', signal,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await response.json().catch(() => null);
+      if (signal.aborted) return;
+      const outcome = `${status(data?.status)}: ${reason(data?.reason)}`;
+      if (!data?.installment_id) { notice(addNote, `Not added; no call placed. ${outcome}`, true); return; }
+      addForm.reset();
+      notice(addNote, `${body.name} added to the queue; no call placed. ${outcome}`);
       await loadQueue(signal);
     });
   });

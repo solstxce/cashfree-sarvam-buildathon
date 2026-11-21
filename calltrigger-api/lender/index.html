@@ -43,6 +43,19 @@
         <p class="notice" id="preview-note" role="status"></p>
         <details id="preview-results" hidden><summary>Rows in this preview</summary><ul></ul></details>
       </form>
+      <form id="add" autocomplete="off" method="post">
+        <h2>Add to queue without calling</h2>
+        <p class="hint" id="add-hint">Type one installment to add it to the queue. This does not call or message anyone.</p>
+        <div class="add-fields">
+          <label>Borrower name<input name="name" required></label>
+          <label>Customer ID <span class="hint">(optional)</span><input name="customer_id"></label>
+          <label>Mobile number<input name="phone_number" type="tel" required></label>
+          <label>Due date<input name="due_date" type="date" required></label>
+          <label>Outstanding (INR)<input name="outstanding_amount" type="number" inputmode="decimal" min="0.01" step="0.01" required></label>
+        </div>
+        <button id="add-button" type="submit" aria-describedby="add-hint">Add without calling</button>
+        <p class="notice" id="add-note" role="status"></p>
+      </form>
     </div>
 
     <section id="queue" aria-labelledby="queue-title">

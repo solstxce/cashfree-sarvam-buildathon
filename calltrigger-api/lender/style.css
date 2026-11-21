@@ -80,6 +80,9 @@ summary { min-height: 2rem; padding-block: .3rem; color: var(--teal); font-size:
 .hours { flex-basis: 100%; }
 .notice:not(:empty) { margin-block: .55rem; border-inline-start: .2rem solid var(--teal); padding: .45rem .7rem; background: #e8f2ed; font-size: .93rem; }
 .notice.error:not(:empty) { border-color: var(--error); color: var(--error); background: #f9eeec; }
+#add { grid-column: 1 / -1; border-inline-start: 0; border-top: 1px solid var(--rule); }
+.add-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr)); gap: .6rem .9rem; margin: .7rem 0 .8rem; }
+.add-fields input { display: block; width: 100%; margin-top: .25rem; }
 #preview-results ul { padding-inline-start: 1.35rem; font-size: .9rem; }
 #preview-results li + li { margin-top: .3rem; }
 @media (hover: hover) and (pointer: fine) {
