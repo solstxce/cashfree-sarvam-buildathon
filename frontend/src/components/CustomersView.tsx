@@ -23,6 +23,7 @@ interface CustomersViewProps {
   customers: Customer[]
   interactions: AgentInteraction[]
   onSelectCustomer: (customer: Customer) => void
+  callingCustomerId?: number | null
   onImportCsv: () => void
   onNewCustomer: () => void
   onNewCall: (customerId: number) => void
@@ -32,7 +33,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
   customers,
   interactions,
   onSelectCustomer,
-  onNewCustomer, onImportCsv,
+  onNewCustomer, onImportCsv, callingCustomerId,
   onNewCall,
 }) => {
   const [search, setSearch] = useState('')
@@ -302,8 +303,10 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                             variant="ghost"
                             size="sm"
                             onClick={() => onNewCall(customer.customer_id)}
+                            disabled={callingCustomerId != null}
+                            aria-label={callingCustomerId === customer.customer_id ? 'Starting call' : `Call ${customer.name}`}
                             className="h-7 px-2 text-xs text-emerald-600"
-                            title="Log Call Interaction"
+                            title="Start collection call"
                           >
                             <PhoneCall className="h-3.5 w-3.5" />
                           </Button>
@@ -380,6 +383,7 @@ export const CustomersView: React.FC<CustomersViewProps> = ({
                       Principal: <strong>{formatCurrency(customer.principal_amount)}</strong> ({customer.interest_rate}%)
                     </span>
                     <span className="text-blue-600 font-semibold">{callCount} Calls</span>
+                    <Button size="sm" disabled={callingCustomerId != null} onKeyDown={event => event.stopPropagation()} onClick={event => { event.stopPropagation(); onNewCall(customer.customer_id) }}><PhoneCall size={14}/>{callingCustomerId === customer.customer_id ? 'Starting…' : 'Call'}</Button>
                   </div>
                 </CardContent>
               </Card>

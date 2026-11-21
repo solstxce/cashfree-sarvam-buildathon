@@ -25,4 +25,7 @@ $patch$;
 COMMIT;
 
 -- Verify the updated definition without rebuilding or changing queue records.
-SELECT pg_get_functiondef('public.refresh_borrower_call_queue()'::regprocedure);
+SELECT strpos(
+    pg_get_functiondef('public.refresh_borrower_call_queue()'::regprocedure),
+    'DELETE FROM public.borrower_call_queue WHERE TRUE;'
+) > 0 AS queue_delete_fixed;
